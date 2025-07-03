@@ -1,0 +1,29 @@
+*spectrolite.nvim* Convert colors between RGB-based color spaces.
+
+===============================================================================
+USAGE                                                       *spectrolite-usage*
+
+Select the color and run the command.
+
+
+===============================================================================
+COMMANDS                                                 *spectrolite-commands*
+
+- `SpectroliteHex`
+  Convert the current color to HEX(A).
+
+- `SpectroliteRgb`
+  Convert the current color to RGB(A).
+
+- `SpectroliteHsl`
+  Convert the current color to HSL(A).
+
+- `SpectroliteHxl`
+  Convert the current color to Cubehelix.
+
+
+===============================================================================
+LICENSE                                                   *spectrolite-license*
+
+MIT License.
+
