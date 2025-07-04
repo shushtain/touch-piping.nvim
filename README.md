@@ -1,4 +1,4 @@
-# Touch-Piping for Neovim
+# Touch Piping for Neovim
 
 A simple game where you can practice navigating the buffer by fixing broken pipes.
 
