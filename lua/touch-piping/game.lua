@@ -19,7 +19,6 @@ M.new_window = function(opts)
 	local state = vim.api.nvim_buf_get_var(buf, "touch_piping")
 	state.success = false
 
-	vim.cmd("hi TouchPipingDefault ctermfg=7 guifg=#B2B2B2")
 	vim.cmd("hi TouchPipingSuccess ctermfg=11 guifg=#89E6F4")
 	state.namespace = vim.api.nvim_create_namespace("touch_piping_highlights")
 
@@ -140,7 +139,7 @@ M.draw = function(opts)
 			id = state.extmark or nil,
 			end_row = #state.weights.task,
 			hl_eol = true,
-			hl_group = "TouchPipingDefault",
+			hl_group = "Normal",
 		})
 	end
 

@@ -49,7 +49,7 @@ Or provide size overrides:
 
 ## Considerations
 
-- Although created to be isolated and harmless, the plugin is not tested properly.
 - Make sure you know how to quit a window in a regular way before playing.
 - Tasks are generated randomly, so there is a small chance of an empty task.
 - Use at least 5 columns and 3 rows to get something playable.
+- Style `double` has the best shapes, but needs bigger font size.
