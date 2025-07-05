@@ -19,6 +19,11 @@ return {
       size = { 18, 6 },
       --- Style: rounded | single | bold | double
       style = "rounded",
+      --- Highlight groups
+      highlights = {
+        default = "Normal",
+        success = "TouchPipingSuccess",
+      }
       --- Keymaps (local to the game)
       keymaps = {
         -- these must be valid vim keymaps

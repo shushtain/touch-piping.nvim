@@ -131,7 +131,7 @@ M.draw = function(opts)
 			id = state.extmark or nil,
 			end_row = #state.weights.task,
 			hl_eol = true,
-			hl_group = "TouchPipingSuccess",
+			hl_group = state.highlights.success or "TouchPipingSuccess",
 		})
 		vim.api.nvim_win_set_config(state.win, { title = " ✓ ", title_pos = "center" })
 	else
@@ -139,7 +139,7 @@ M.draw = function(opts)
 			id = state.extmark or nil,
 			end_row = #state.weights.task,
 			hl_eol = true,
-			hl_group = "Normal",
+			hl_group = state.highlights.default or "Normal",
 		})
 	end
 
