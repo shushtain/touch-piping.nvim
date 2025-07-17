@@ -9,6 +9,8 @@ M.start = function(opts)
   game.new_window(options)
 end
 
+---Setup function for Touch Piping
+---@param opts TouchPiping.Config|nil
 M.setup = function(opts)
   config.__setup(opts)
 end
