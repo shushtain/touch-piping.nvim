@@ -1,24 +1,29 @@
----@diagnostic disable: inject-field
-
 ---@class TouchPiping.Config
----@field size? table {<columns>, <rows>}
----@field style? string rounded | single | bold | double
----@field highlights? Highlights Highlight styles for the game elements
----@field keymaps? Keymaps Key bindings local to the game buffer
+---@field no_border? boolean If `true`, disable window border. Default is `false`
+---@field size? table Game size as {<cols>, <rows>}
+---@field style? TouchPiping.Config.Style Style of elements
+---@field highlights? TouchPiping.Config.Highlights Highlighting for game elements
+---@field keymaps? TouchPiping.Config.Keymaps Key bindings local to the game buffer
 
----@class Highlights
----@field default? string Defaults to `Normal`
----@field success? string Defaults to `TouchPipingSuccess`
+---@class TouchPiping.Config.Highlights
+---@field default? string Default is `Normal`
+---@field success? string Default is `TouchPipingSuccess`
 
----@class Keymaps
----@field rotate_clockwise? string Any valid keymap. Defaults to `r`
----@field rotate_reverse? string Any valid keymap. Defaults to `R`
----@field quit? string Any valid keymap. Defaults to `q` to match other plugins. Change to something that is harder to hit by accident
+---@class TouchPiping.Config.Keymaps
+---@field rotate_clockwise? string Any valid keymap. Default is `r`
+---@field rotate_reverse? string Any valid keymap. Default is `R`
+---@field quit? string Any valid keymap. Default is `q`
 
----@type TouchPiping.Config
+---@alias TouchPiping.Config.Style
+---| "rounded" ╭┼┼┼╯
+---| "single"  ┌┼┼┼┘
+---| "bold"    ┏╋╋╋┛
+---| "double"  ╔╬╬╬╝
+
 local M = {}
 
-M.defaults = {
+---@type TouchPiping.Config
+M.config = {
   size = { 18, 6 },
   style = "rounded",
   highlights = {
@@ -32,10 +37,9 @@ M.defaults = {
   },
 }
 
-M.options = {}
-
-M.__setup = function(opts)
-  M.options = vim.tbl_deep_extend("force", {}, M.defaults, opts or {})
+---@param opts? TouchPiping.Config
+function M.setup(opts)
+  M.config = vim.tbl_deep_extend("force", M.config, opts or {})
 end
 
 return M

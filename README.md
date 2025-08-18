@@ -6,31 +6,33 @@ A simple game where you can practice navigating the buffer by fixing broken pipe
 
 ## Setup
 
-### Lazy
-
-Provided values are the defaults:
+Setup is optional and used only to override default configuration. The defaults are:
 
 ```lua
 return {
   "shushtain/touch-piping.nvim",
   config = function()
     require("touch-piping").setup({
-      --- Grid size: { cols, rows }
+      -- Grid size: { cols, rows }
       size = { 18, 6 },
-      --- Style: rounded | single | bold | double
+
+      -- Style: rounded | single | bold | double
       style = "rounded",
-      --- Highlight groups
+
+      -- If `true`, window will have "solid" border
+      -- which blends completely with the background
+      no_border = false,
+
+      -- Highlight groups
       highlights = {
         default = "Normal",
         success = "TouchPipingSuccess",
       }
-      --- Keymaps (local to the game)
+
+      -- Buffer-local keymaps
       keymaps = {
-        -- these must be valid vim keymaps
         rotate_clockwise = "r",
         rotate_reverse = "R",
-        -- this can be changed or set to false
-        -- if often quitting by accident
         quit = "q",
       },
     })
@@ -56,5 +58,5 @@ Or provide size overrides:
 
 - Make sure you know how to quit a window in a regular way before playing.
 - Tasks are generated randomly, so there is a small chance of an empty task.
-- Use at least 5 columns and 3 rows to get something playable.
+- At least `5x5` grid is recommended to get something playable.
 - Style `double` has the best shapes, but needs bigger font size.

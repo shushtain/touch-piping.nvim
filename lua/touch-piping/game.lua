@@ -1,76 +1,69 @@
-local config = require("touch-piping.config")
-local utils = require("touch-piping.utils")
 local M = {}
 
-M.new_window = function(opts)
+M.new = function(opts)
   local buf = vim.api.nvim_create_buf(false, true)
+
   vim.bo[buf].bufhidden = "wipe"
   vim.bo[buf].buftype = "nofile"
   vim.bo[buf].swapfile = false
   vim.bo[buf].readonly = true
 
   vim.b[buf].touch_piping = opts
-  local plugin = vim.api.nvim_get_var("touch_piping")
-  plugin.buffer = buf
-  vim.api.nvim_set_var("touch_piping", plugin)
+  local plugin = vim.g.touch_piping
+  plugin.buf = buf
+  vim.g.touch_piping = plugin
 
-  M.generate()
+  M.gen()
 
-  local state = vim.api.nvim_buf_get_var(buf, "touch_piping")
+  local state = vim.b[buf].touch_piping
   state.success = false
 
   vim.cmd("hi TouchPipingSuccess ctermfg=11 guifg=#89E6F4")
   state.namespace = vim.api.nvim_create_namespace("touch_piping_highlights")
 
-  vim.api.nvim_buf_set_var(buf, "touch_piping", state)
+  vim.b[buf].touch_piping = state
   M.draw()
 
-  state.win = vim.api.nvim_open_win(buf, true, {
+  local win = vim.api.nvim_open_win(buf, true, {
     relative = "editor",
     row = (vim.o.lines - #state.weights.task - 4) / 2,
     col = (vim.o.columns - #state.weights.task[1]) / 2,
     width = #state.weights.task[1],
     height = #state.weights.task,
-    border = state.style,
+    border = state.no_border and "solid" or state.style,
     style = "minimal",
     focusable = true,
     noautocmd = true,
   })
-  vim.wo[state.win].number = false
-  vim.wo[state.win].relativenumber = false
-  vim.wo[state.win].wrap = false
-  vim.wo[state.win].scrolloff = 0
-  vim.wo[state.win].sidescrolloff = 0
+
+  vim.wo[win].number = false
+  vim.wo[win].relativenumber = false
+  vim.wo[win].wrap = false
+  vim.wo[win].scrolloff = 0
+  vim.wo[win].sidescrolloff = 0
   vim.bo[buf].modifiable = false
 
-  vim.api.nvim_buf_set_var(buf, "touch_piping", state)
+  state.win = win
+  vim.b[buf].touch_piping = state
 
-  -- CHANGE TO STATE
-  vim.keymap.set(
-    "n",
-    state.keymaps.rotate_clockwise,
-    function()
-      M.rotate_cell({ clockwise = true })
-    end,
-    { buffer = buf, noremap = true, silent = true, desc = "Rotate Clockwise" }
-  )
-  vim.keymap.set("n", state.keymaps.rotate_reverse, function()
-    M.rotate_cell({ clockwise = false })
-  end, { buffer = buf, noremap = true, silent = true, desc = "Rotate Reverse" })
-  if
-    state.keymaps.quit
-    and type(state.keymaps.quit) == "string"
-    and #state.keymaps.quit > 0
-  then
-    vim.keymap.set("n", config.options.keymaps.quit, function()
-      vim.cmd("close")
-    end, { buffer = buf, noremap = true, silent = true, desc = "Quit" })
-  end
+  vim.keymap.set("n", opts.keymaps.rotate_clockwise, function()
+    M.rotate(true)
+  end, { buffer = buf, desc = "Rotate Clockwise" })
+
+  vim.keymap.set("n", opts.keymaps.rotate_reverse, function()
+    M.rotate(false)
+  end, { buffer = buf, desc = "Rotate Reverse" })
+
+  vim.keymap.set("n", opts.keymaps.quit, function()
+    vim.cmd("close")
+  end, { buffer = buf, desc = "Quit" })
 end
 
-M.generate = function(opts)
-  local buf = vim.g.touch_piping.buffer
-  local state = vim.api.nvim_buf_get_var(buf, "touch_piping")
+M.gen = function()
+  local utils = require("touch-piping.utils")
+
+  local buf = vim.g.touch_piping.buf
+  local state = vim.b[buf].touch_piping
 
   local width = state.size[1] * 1
   local height = state.size[2] + 2
@@ -114,15 +107,15 @@ M.generate = function(opts)
   table.remove(task, 1)
   table.remove(task, #task)
 
-  local buf = vim.g.touch_piping.buffer
-  local state = vim.api.nvim_buf_get_var(buf, "touch_piping")
   state.weights = { solution = solution, task = task }
-  vim.api.nvim_buf_set_var(buf, "touch_piping", state)
+  vim.b[buf].touch_piping = state
 end
 
-M.draw = function(opts)
-  local buf = vim.g.touch_piping.buffer
-  local state = vim.api.nvim_buf_get_var(buf, "touch_piping")
+M.draw = function()
+  local utils = require("touch-piping.utils")
+
+  local buf = vim.g.touch_piping.buf
+  local state = vim.b[buf].touch_piping
 
   vim.bo[buf].readonly = false
   vim.bo[buf].modifiable = true
@@ -145,10 +138,12 @@ M.draw = function(opts)
       hl_eol = true,
       hl_group = state.highlights.success or "TouchPipingSuccess",
     })
-    vim.api.nvim_win_set_config(
-      state.win,
-      { title = " ✓ ", title_pos = "center" }
-    )
+    if not state.no_border then
+      vim.api.nvim_win_set_config(
+        state.win,
+        { title = " ✓ ", title_pos = "center" }
+      )
+    end
   else
     state.extmark = vim.api.nvim_buf_set_extmark(buf, state.namespace, 0, 0, {
       id = state.extmark or nil,
@@ -158,34 +153,36 @@ M.draw = function(opts)
     })
   end
 
-  vim.api.nvim_buf_set_var(buf, "touch_piping", state)
-
   vim.bo[buf].modifiable = false
   vim.bo[buf].readonly = true
+
+  vim.b[buf].touch_piping = state
 end
 
-M.rotate_cell = function(opts)
-  local buf = vim.g.touch_piping.buffer
-  local state = vim.api.nvim_buf_get_var(buf, "touch_piping")
+M.rotate = function(clockwise)
+  local utils = require("touch-piping.utils")
+
+  local buf = vim.g.touch_piping.buf
+  local state = vim.b[buf].touch_piping
 
   local cursor = vim.fn.getcursorcharpos(0)
   local line = cursor[2]
   local col = cursor[3]
 
   local current_char = state.weights.task[line][col]
-  local new_char = opts.clockwise and utils.logic[current_char].next
+  local new_char = clockwise and utils.logic[current_char].next
     or utils.logic[current_char].prev
 
   state.weights.task[line][col] = new_char
-  vim.api.nvim_buf_set_var(buf, "touch_piping", state)
+  vim.b[buf].touch_piping = state
 
   M.check()
   M.draw()
 end
 
-M.check = function(opts)
-  local buf = vim.g.touch_piping.buffer
-  local state = vim.api.nvim_buf_get_var(buf, "touch_piping")
+M.check = function()
+  local buf = vim.g.touch_piping.buf
+  local state = vim.b[buf].touch_piping
 
   for y, _ in ipairs(state.weights.task) do
     for x, _ in ipairs(state.weights.task[y]) do
@@ -199,7 +196,7 @@ M.check = function(opts)
   vim.keymap.set("n", state.keymaps.rotate_reverse, "<Nop>", { buffer = buf })
 
   state.success = true
-  vim.api.nvim_buf_set_var(buf, "touch_piping", state)
+  vim.b[buf].touch_piping = state
 end
 
 return M

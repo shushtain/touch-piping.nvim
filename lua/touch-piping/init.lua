@@ -1,18 +1,18 @@
-local config = require("touch-piping.config")
-local game = require("touch-piping.game")
-local utils = require("touch-piping.utils")
 local M = {}
 
-M.start = function(opts)
-  local options =
-    vim.tbl_deep_extend("force", {}, config.options, { size = opts } or {})
-  game.new_window(options)
+function M.start(opts)
+  local config = vim.tbl_deep_extend(
+    "force",
+    require("touch-piping.config").config,
+    opts or {}
+  )
+  require("touch-piping.game").new(config)
 end
 
----Setup function for Touch Piping
----@param opts TouchPiping.Config|nil
-M.setup = function(opts)
-  config.__setup(opts)
+---Override default configuration.
+---@param opts? TouchPiping.Config
+function M.setup(opts)
+  require("touch-piping.config").setup(opts)
 end
 
 return M
