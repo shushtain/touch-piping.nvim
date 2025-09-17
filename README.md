@@ -1,5 +1,7 @@
 # Touch Piping for Neovim
 
+> ⚠️Deprecated but functional. Fun project, though. Feel free to clone it and build upon.
+
 A simple game where you can practice navigating the buffer by fixing broken pipes.
 
 ![Example](https://raw.githubusercontent.com/shushtain/touch-piping.nvim/refs/heads/main/example.png)
